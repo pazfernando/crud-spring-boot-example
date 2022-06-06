@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"
+        integrity="sha256-eTyxS0rkjpLEo16uXTS0uVCS4815lc40K2iVpWDvdSY=" crossorigin="anonymous"></script>
+    <script>
+        function load_visits() {
+            $.getJSON("api/visits", (_visits) => {
+                $('#cdata').empty();
+                $.each(_visits._embedded.visits, (_key, _value) => {
+                    var tagStart = '<tr>';
+                    var tagEnd = '</tr>';
+                    var content = '<td>' + _value.date + '</td><td>' + _value.name + '</td><td>' + _value.comment + '</td>';
+                    var _delete = '<td><a href="#" onclick="fdelete(' + _value.id + ')">Delete</a></td>';
+                    $('#cdata').append(tagStart + content + _delete + tagEnd);
+                })
+            });
+        }
+        $(document).ready(function () {
+            console.log('Ready');
+            load_visits();
+            $("#datepicker").datepicker({ dateFormat: "yy-mm-dd" });
+            $('#cform').submit((e) => {
+                e.preventDefault();
+
+                if ($('#datepicker').val() == '' || $('#name').val() == '') {
+                    alert('Should enter at least date and name.');
+                    return;
+                }
+
+                var data = {
+                    date: $('#datepicker').val(),
+                    name: $('#name').val(),
+                    comment: $('#comments').val()
+                };
+
+                $.post({
+                    url: 'api/visits',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    success: () => {
+                        console.log('Saved!');
+                        load_visits();
+                        $("#cform")[0].reset();
+                    }
+                }).fail(function (data) {
+                    alert("error: " + data.responseJSON.message);
+                });
+            })
+        });
+        function fdelete(_id) {
+            $.ajax({
+                url: 'api/visits/' + _id,
+                type: 'DELETE',
+                success: function (result) {
+                    console.log('Deleted!');
+                    load_visits();
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Visits</h1>
+    <div>
+        <form id="cform">
+            <div>
+                <label for="datapicker">Date:</label>
+                <input type="text" name="date" id="datepicker">
+            </div>
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" name="name" id="name">
+            </div>
+            <div>
+                <label for="comment">Comments:</label>
+                <textarea name="comment" id="comments"></textarea>
+            </div>
+            <input type="submit" value="Save">
+        </form>
+    </div>
+    <div style="padding-top: 30px;">
+        <table>
+            <thead>
+                <tr>
+                    <td style="font-weight: bolder;">Date</td>
+                    <td style="font-weight: bolder;">Name</td>
+                    <td style="font-weight: bolder;">Comment</td>
+                </tr>
+            </thead>
+            <tbody id="cdata">
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

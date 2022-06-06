@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:  
+      id:  createTable-example  
+      author:  cioe
+      changes:  
+      -  createTable:  
+          columns:  
+          -  column:  
+              name:  id
+              type:  BIGINT
+              autoIncrement: true
+              constraints:
+                primaryKey: true
+                nullable: false
+          -  column:  
+              name:  date
+              type:  DATETIME
+              constraints:
+                nullable: false
+          -  column:  
+              name:  name
+              type:  VARCHAR(255)
+              constraints:
+                nullable: false
+          -  column:  
+              name:  comment
+              type:  VARCHAR(2048)
+          tableName:  visits
