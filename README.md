@@ -2,7 +2,7 @@ Simple RESTful example that create or delete registries for Visitor.
 
 Is build on Spring Boot so after compile just run[
 
-´java -jar crud-0.0.1-SNAPSHOT.war´
+´´java -jar crud-0.0.1-SNAPSHOT.war´´
 
 By default the ´dev´ profile is active so the database is in memory.
 
