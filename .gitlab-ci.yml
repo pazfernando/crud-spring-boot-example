@@ -37,7 +37,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - ./mvnw $MAVEN_CLI_OPTS clean package
     - echo "Compile complete."
 
-sast-gl-sast:
+sast:
   stage: sast
   artifacts:
     reports:
