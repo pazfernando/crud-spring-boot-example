@@ -45,7 +45,7 @@ build-job:       # This job runs in the build stage, which runs first.
 
 include:
   #- template: Jobs/SAST.gitlab-ci.yml
-  - remote: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Jobs/SAST.gitlab-ci.yml'
+  - remote: 'https://gitlab.com/gitlab-org/gitlab/-/blob/v16.7.4-ee/lib/gitlab/ci/templates/Jobs/SAST.gitlab-ci.yml'
 
 sast-snyk:
   stage: sast
