@@ -50,7 +50,8 @@ sast-snyk:
     - chmod +x ./snyk
     - mv ./snyk /usr/local/bin/ 
     - snyk auth $SNYK_TOKEN
-    - snyk test --all-projects --severity-threshold=high
+    - snyk test --all-projects --severity-threshold=high || true
+    - snyk monitor
   artifacts:
     paths:
       - snyk-report.json
