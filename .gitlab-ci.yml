@@ -21,6 +21,8 @@ image: amazoncorretto:17.0.11
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  # SNYK_TOKEN: "${SNYK_TOKEN}"
+  SNYK_TOKEN: "36e4489b-7cab-447f-90dd-aa287f43b3f7"
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -35,11 +37,21 @@ build-job:       # This job runs in the build stage, which runs first.
     - ./mvnw $MAVEN_CLI_OPTS clean package
     - echo "Compile complete."
 
-sast:
+sast-gl-sast:
   stage: sast
   artifacts:
     reports:
-      sast: gl-sast-report.json    
+      sast: gl-sast-report.json
+
+sast-snyk:
+  stage: sast
+  script:
+    - npm install -g snyk
+    - snyk auth $SNYK_TOKEN
+    - snyk test --all-projects
+  artifacts:
+    paths:
+      - snyk-report.json
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
