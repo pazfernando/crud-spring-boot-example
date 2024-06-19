@@ -16,6 +16,15 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
+include:
+  # 1: include the component
+  - component: gitlab.com/to-be-continuous/maven/gitlab-ci-maven@3.9.2
+    # 2: set/override component inputs
+    inputs:
+      # ⚠ this is only an example
+      image: registry.hub.docker.com/library/maven:3.8-openjdk-18
+      deploy-enabled: true
+
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
