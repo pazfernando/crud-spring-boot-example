@@ -21,10 +21,13 @@ image: amazoncorretto:17.0.11
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  # SNYK_TOKEN: "${SNYK_TOKEN}"
+  SNYK_TOKEN: "36e4489b-7cab-447f-90dd-aa287f43b3f7"
 
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
+  - sast
   - deploy
 
 build-job:       # This job runs in the build stage, which runs first.
@@ -34,6 +37,25 @@ build-job:       # This job runs in the build stage, which runs first.
     - ./mvnw $MAVEN_CLI_OPTS clean package
     - echo "Compile complete."
 
+sast:
+  stage: sast
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+
+sast-snyk:
+  stage: sast
+  script:
+    - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+    - chmod +x ./snyk
+    - mv ./snyk /usr/local/bin/ 
+    - snyk auth $SNYK_TOKEN
+    - snyk test --all-projects --severity-threshold=high || true
+    - snyk monitor
+  artifacts:
+    paths:
+      - snyk-report.json
+
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
@@ -41,11 +63,14 @@ unit-test-job:   # This job runs in the test stage.
     - ./mvnw $MAVEN_CLI_OPTS test -Pdev
     - echo "Code coverage is 90%"
 
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
 lint-test-job:   # This job also runs in the test stage.
   stage: test    # It can run at the same time as unit-test-job (in parallel).
   script:
     - echo "Linting code... This will take about 10 seconds."
-    - sleep 10
+    #- ./mvnw $MAVEN_CLI_OPTS sonar:sonar
     - echo "No lint issues found."
 
 deploy-job:      # This job runs in the deploy stage.
