@@ -30,9 +30,6 @@ stages:          # List of stages for jobs, and their order of execution
   - sast
   - deploy
 
-include:
-  - template: Jobs/SAST.gitlab-ci.yml
-
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
@@ -40,11 +37,14 @@ build-job:       # This job runs in the build stage, which runs first.
     - ./mvnw $MAVEN_CLI_OPTS clean package
     - echo "Compile complete."
 
-sast:
-  stage: sast
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
+#sast:
+#  stage: sast
+#  artifacts:
+#    reports:
+#      sast: gl-sast-report.json
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
 
 sast-snyk:
   stage: sast
