@@ -19,7 +19,7 @@
 image: amazoncorretto:11.0.23
 
 variables:
-  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode --errors --fail-at-end"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
 
 stages:          # List of stages for jobs, and their order of execution
