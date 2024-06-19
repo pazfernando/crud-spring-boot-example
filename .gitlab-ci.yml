@@ -50,11 +50,12 @@ sast-snyk:
     - chmod +x ./snyk
     - mv ./snyk /usr/local/bin/ 
     - snyk auth $SNYK_TOKEN
-    - snyk test --all-projects --severity-threshold=high || true
+    - snyk test --all-projects --severity-threshold=high
     - snyk monitor
   artifacts:
     paths:
       - snyk-report.json
+  allow_failure: true
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
