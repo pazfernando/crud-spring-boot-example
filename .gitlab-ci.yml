@@ -16,7 +16,7 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
-image: amazoncorretto:11.0.23
+image: amazoncorretto:17.0.11
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
