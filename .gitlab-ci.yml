@@ -44,7 +44,7 @@ build-job:       # This job runs in the build stage, which runs first.
 #      sast: gl-sast-report.json
 
 include:
-  - template: Security/SAST.gitlab-ci.yml
+  - template: Jobs/SAST.gitlab-ci.yml
 
 sast-snyk:
   stage: sast
