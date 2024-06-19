@@ -46,7 +46,9 @@ sast:
 sast-snyk:
   stage: sast
   script:
-    - npm install -g snyk
+    - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+    - chmod +x ./snyk
+    - mv ./snyk /usr/local/bin/ 
     - snyk auth $SNYK_TOKEN
     - snyk test --all-projects
   artifacts:
