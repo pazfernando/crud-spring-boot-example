@@ -16,14 +16,9 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
-include:
-  # 1: include the component
-  - component: gitlab.com/to-be-continuous/maven/gitlab-ci-maven@3.9.2
-    # 2: set/override component inputs
-    inputs:
-      # ⚠ this is only an example
-      image: registry.hub.docker.com/library/maven:3.8-openjdk-18
-      deploy-enabled: true
+variables:
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode --errors --fail-at-end"
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -34,6 +29,7 @@ build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
     - echo "Compiling the code..."
+    - ./mvnw $MAVEN_CLI_OPTS clean package
     - echo "Compile complete."
 
 unit-test-job:   # This job runs in the test stage.
