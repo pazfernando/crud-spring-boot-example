@@ -24,8 +24,8 @@ before_script:
   - yum update -y
   - amazon-linux-extras install docker
   # Iniciar Docker
-  - service docker start
-  #- sleep 5  # Esperar unos segundos para que Docker Daemon se inicie
+  - nohup /usr/bin/dockerd > /dev/null 2>&1 &
+  - sleep 10  # Esperar unos segundos para que Docker Daemon se inicie
   # Verificar instalación de Docker
   - docker --info
 
