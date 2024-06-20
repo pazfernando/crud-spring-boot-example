@@ -21,8 +21,6 @@ resource "null_resource" "deploy_docker" {
       host        = var.instance_ip
     }
   }
-
-  depends_on = [aws_instance.app_instance]
 }
 
 variable "region" {
