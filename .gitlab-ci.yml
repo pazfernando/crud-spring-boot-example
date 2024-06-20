@@ -101,6 +101,8 @@ release:
     name: hashicorp/terraform:light
     entrypoint: [""]
   before_script:
+    - echo "$SSH_PRIVATE_KEY" > /tmp/ssh_private_key.pem
+    - chmod 600 /tmp/ssh_private_key.pem
     - apk add --no-cache curl jq python3 py3-pip
     - pip3 install awscli
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
@@ -108,7 +110,7 @@ release:
     - aws configure set default.region $AWS_DEFAULT_REGION
   script:
     - terraform init
-    - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$DOCKER_USER" -var "docker_password=$DOCKER_PASSWORD" -var "docker_registry=$DOCKER_REGISTRY" -var "docker_image=$DOCKER_IMAGE" -var "private_key_path=$PRIVATE_KEY_PATH"
+    - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$DOCKER_USER" -var "docker_password=$DOCKER_PASSWORD" -var "docker_registry=$DOCKER_REGISTRY" -var "docker_image=$DOCKER_IMAGE" -var "private_key_path=/tmp/ssh_private_key.pem"
   dependencies:
     - docker_build
 
