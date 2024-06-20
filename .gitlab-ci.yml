@@ -37,8 +37,10 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Compiling the code..."
     - ./mvnw $MAVEN_CLI_OPTS clean package
     - echo "Compile complete."
-    #- ls -l target
-    #- pwd
+  artifacts:
+    paths:
+      - target/
+    expire_in: 1 week
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
@@ -76,6 +78,8 @@ sast-snyk:
 
 docker_build:
   stage: docker_build
+  dependencies:
+    - build-job
   before_script:
     # Instalar Docker
     - cat /etc/*-release
@@ -87,7 +91,7 @@ docker_build:
     # Verificar instalación de Docker
     - docker ps
   script:
-    - ls -l
+    - ls -l target
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
     - docker build -t "$CI_REGISTRY_IMAGE:latest" .
     - docker push "$CI_REGISTRY_IMAGE:latest"
