@@ -1,4 +1,4 @@
-FROM openjdk:17-jre-slim
+FROM amazoncorretto:17.0.11-alpine
 WORKDIR /app
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
