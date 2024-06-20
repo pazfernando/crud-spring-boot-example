@@ -18,16 +18,19 @@
 
 image: amazoncorretto:17.0.11
 
+services:
+  - docker:dind
+
 before_script:
   # Instalar Docker
-  - cat /etc/*-release
-  - yum update -y
-  - amazon-linux-extras install docker
+  #- cat /etc/*-release
+  #- yum update -y
+  #- amazon-linux-extras install docker
   # Iniciar Docker
-  - dockerd-entrypoint.sh &
-  - sleep 5  # Esperar unos segundos para que Docker Daemon se inicie
+  #- dockerd-entrypoint.sh &
+  #- sleep 5  # Esperar unos segundos para que Docker Daemon se inicie
   # Verificar instalación de Docker
-  - docker --version
+  - docker --info
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
