@@ -101,7 +101,7 @@ release:
     name: hashicorp/terraform:light
     entrypoint: [""]
   before_script:
-    - echo "$SSH_PRIVATE_KEY" > /tmp/ssh_private_key.pem
+    - echo $SSH_PRIVATE_KEY > /tmp/ssh_private_key.pem
     - chmod 600 /tmp/ssh_private_key.pem
     - apk add --no-cache curl jq python3 py3-pip
     - pip3 install awscli
