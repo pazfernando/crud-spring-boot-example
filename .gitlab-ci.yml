@@ -18,6 +18,9 @@
 
 image: amazoncorretto:17.0.11
 
+services:
+  - docker:dind
+
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
