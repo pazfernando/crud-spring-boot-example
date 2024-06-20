@@ -21,11 +21,9 @@ image: amazoncorretto:17.0.11
 before_script:
   # Instalar Docker
   - cat /etc/*-release
-  - yum install -y yum-utils
-  - yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  - yum install -y docker-ce docker-ce-cli containerd.io
+  - yum install -y yum-utils docker
   # Iniciar Docker
-  - dockerd-entrypoint.sh &  # Iniciar Docker Daemon
+  - systemctl start docker.service  # Iniciar Docker Daemon
   - sleep 5  # Esperar unos segundos para que Docker Daemon se inicie
   # Verificar instalación de Docker
   - docker --version
