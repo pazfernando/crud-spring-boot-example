@@ -18,8 +18,16 @@
 
 image: amazoncorretto:17.0.11
 
-services:
-  - docker:dind
+before_script:
+  # Instalar Docker
+  - yum install -y yum-utils
+  - yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  - yum install -y docker-ce docker-ce-cli containerd.io
+  # Iniciar Docker
+  - dockerd-entrypoint.sh &  # Iniciar Docker Daemon
+  - sleep 5  # Esperar unos segundos para que Docker Daemon se inicie
+  # Verificar instalación de Docker
+  - docker --version
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
