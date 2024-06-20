@@ -22,7 +22,6 @@ variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   SNYK_TOKEN: "${SNYK_TOKEN}"
-  #SNYK_TOKEN: "36e4489b-7cab-447f-90dd-aa287f43b3f7"
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -37,10 +36,10 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Compiling the code..."
     - ./mvnw $MAVEN_CLI_OPTS clean package
     - echo "Compile complete."
-#  artifacts:
-#    paths:
-#      - target/*.war
-#    expire_in: 1 week
+  artifacts:
+    paths:
+      - target/*.war
+    expire_in: 1 week
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
@@ -95,6 +94,23 @@ docker_build:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
     - docker build -t "$CI_REGISTRY_IMAGE:latest" .
     - docker push "$CI_REGISTRY_IMAGE:latest"
+
+release:
+  stage: deploy
+  image: 
+    name: hashicorp/terraform:light
+    entrypoint: [""]
+  before_script:
+    - apk add --no-cache curl jq python3 py3-pip
+    - pip3 install awscli
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set default.region $AWS_DEFAULT_REGION
+  script:
+    - terraform init
+    - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$DOCKER_USER" -var "docker_password=$DOCKER_PASSWORD" -var "docker_registry=$DOCKER_REGISTRY" -var "docker_image=$DOCKER_IMAGE" -var "private_key_path=$PRIVATE_KEY_PATH"
+  dependencies:
+    - docker_build
 
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
