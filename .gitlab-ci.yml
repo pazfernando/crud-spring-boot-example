@@ -39,7 +39,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Compile complete."
   artifacts:
     paths:
-      - target/
+      - target/*.war
     expire_in: 1 week
 
 unit-test-job:   # This job runs in the test stage.
