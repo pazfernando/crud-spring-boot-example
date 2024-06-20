@@ -37,10 +37,10 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Compiling the code..."
     - ./mvnw $MAVEN_CLI_OPTS clean package
     - echo "Compile complete."
-#  artifacts:
-#    paths:
-#      - target/*.war
-#    expire_in: 1 week
+  artifacts:
+    paths:
+      - target/*.war
+    expire_in: 1 week
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
