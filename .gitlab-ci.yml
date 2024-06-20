@@ -27,7 +27,7 @@ before_script:
   - nohup /usr/bin/dockerd > /dev/null 2>&1 &
   - sleep 10  # Esperar unos segundos para que Docker Daemon se inicie
   # Verificar instalación de Docker
-  - docker --info
+  - docker ps
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
