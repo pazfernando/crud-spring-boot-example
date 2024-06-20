@@ -21,8 +21,8 @@ image: amazoncorretto:17.0.11
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-  # SNYK_TOKEN: "${SNYK_TOKEN}"
-  SNYK_TOKEN: "36e4489b-7cab-447f-90dd-aa287f43b3f7"
+  SNYK_TOKEN: "${SNYK_TOKEN}"
+  #SNYK_TOKEN: "36e4489b-7cab-447f-90dd-aa287f43b3f7"
 
 stages:          # List of stages for jobs, and their order of execution
   - build
