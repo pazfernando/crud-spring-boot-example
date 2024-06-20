@@ -118,3 +118,5 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
+  after_script:
+    - terraform output deployed_port

@@ -60,7 +60,3 @@ variable "docker_image" {
 variable "instance_ip" {
   description = "IP address of the existing EC2 instance"
 }
-
-output "deployed_port" {
-  value = file("/tmp/deployed_port")
-}
