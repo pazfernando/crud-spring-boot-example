@@ -21,10 +21,10 @@ image: amazoncorretto:17.0.11
 before_script:
   # Instalar Docker
   - cat /etc/*-release
-  - yum install -y yum-utils
-  - yum install -y docker
+  - yum update -y
+  - amazon-linux-extras install docker
   # Iniciar Docker
-  - systemctl start docker.service  # Iniciar Docker Daemon
+  - service docker start
   - sleep 5  # Esperar unos segundos para que Docker Daemon se inicie
   # Verificar instalación de Docker
   - docker --version
