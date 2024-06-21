@@ -11,7 +11,7 @@ resource "null_resource" "deploy_docker" {
       "sudo docker login -u ${var.docker_user} -p ${var.docker_password} ${var.docker_registry}",
       "sudo docker pull ${var.docker_image}:latest",
       "random_port=$(shuf -i 10000-11000 -n 1)",
-      "sudo docker run -e \"SPRING_PROFILES_ACTIVE=qa\" -e CRUD_DB_URL=${var.crud_db_url} -e CRUD_DB_USERNAME=${var.crud_db_username} -e CRUD_DB_PASSWORD=${var.crud_db_password} -d -p $random_port:8080 ${var.docker_image}:latest",
+      "sudo docker run -e SPRING_PROFILES_ACTIVE=qa -e CRUD_DB_URL=${var.crud_db_url} -e CRUD_DB_USERNAME=${var.crud_db_username} -e CRUD_DB_PASSWORD=${var.crud_db_password} -d -p $random_port:8080 ${var.docker_image}:latest",
       "echo $random_port > /tmp/deployed_port"
     ]
 
