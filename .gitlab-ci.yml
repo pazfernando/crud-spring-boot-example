@@ -40,6 +40,8 @@ build-job:       # This job runs in the build stage, which runs first.
     paths:
       - target/*.war
     expire_in: 1 week
+  only:
+    - master
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
@@ -47,6 +49,8 @@ unit-test-job:   # This job runs in the test stage.
     - echo "Running unit tests... This will take about 60 seconds."
     - ./mvnw $MAVEN_CLI_OPTS test -Pdev
     - echo "Code coverage is 90%"
+  only:
+    - master
 
 lint-test-job:   # This job also runs in the test stage.
   stage: test    # It can run at the same time as unit-test-job (in parallel).
@@ -54,6 +58,8 @@ lint-test-job:   # This job also runs in the test stage.
     - echo "Linting code... This will take about 10 seconds."
     #- ./mvnw $MAVEN_CLI_OPTS sonar:sonar
     - echo "No lint issues found."
+  only:
+    - master
 
 #sast:
 #  stage: sast
@@ -74,6 +80,8 @@ sast-snyk:
     paths:
       - snyk-report.json
   allow_failure: true
+  only:
+    - master
 
 docker_build:
   stage: docker_build
@@ -94,6 +102,8 @@ docker_build:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
     - docker build -t "$CI_REGISTRY_IMAGE:latest" .
     - docker push "$CI_REGISTRY_IMAGE:latest"
+  only:
+    - master
 
 release:
   stage: deploy
@@ -115,19 +125,36 @@ release:
   script:
     - terraform init
     - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$CI_REGISTRY_USER" -var "docker_password=$CI_REGISTRY_PASSWORD" -var "docker_registry=$CI_REGISTRY" -var "docker_image=$CI_REGISTRY_IMAGE" -var "private_key_path=/tmp/ssh_private_key.pem"  -var "crud_db_url=$CRUD_DB_URL" -var "crud_db_username=$CRUD_DB_USERNAME" -var "crud_db_password=$CRUD_DB_PASSWORD"
-#    - scp -i /tmp/ssh_private_key.pem root@$INSTANCE_IP:/home/ec2-user/deployed_port .
-#  artifacts:
-#    paths:
-#      - deployed_port
+    # - scp -i /tmp/ssh_private_key.pem ec2-user@$INSTANCE_IP:/tmp/deployed_port .
+  artifacts:
+    paths:
+      - deployed_port
   dependencies:
     - docker_build
+  only:
+    - master
 
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  image: bitnami/kubectl:latest
   environment: production
+  variables:
+    CRUD_DB_URL: $CRUD_DB_URL
+    CRUD_DB_USERNAME: $CRUD_DB_USERNAME
+    CRUD_DB_PASSWORD: $CRUD_DB_PASSWORD
+    KUBECONFIG: /etc/deploy/kubeconfig
+  before_script:
+    # Configurar kubectl
+    - mkdir -p /etc/deploy
+    - echo "$KUBECONFIG_CONTENT" > /etc/deploy/kubeconfig
+    - chmod 600 /etc/deploy/kubeconfig
   script:
     - echo "Deploying application..."
+    - kubectl apply -f k8s/deployment.yaml
+    - kubectl apply -f k8s/service.yaml
     - echo "Application successfully deployed."
+  dependencies:
+    - docker_build
   after_script:
     - terraform output deployed_port
   when: manual

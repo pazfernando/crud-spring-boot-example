@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crud-app
+  labels:
+    app: crud-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: crud-app
+  template:
+    metadata:
+      labels:
+        app: crud-app
+    spec:
+      containers:
+        - name: crud-app
+          image: gitlab.softwareevolutivo.net:5050/demo/crud-spring-boot-example
+          ports:
+            - containerPort: 8080
+          env:
+            - name: CRUD_DB_URL
+              value: ${CRUD_DB_URL}
+            - name: CRUD_DB_USERNAME
+              value: ${CRUD_DB_USERNAME}
+            - name: CRUD_DB_PASSWORD
+              value: ${CRUD_DB_PASSWORD}
