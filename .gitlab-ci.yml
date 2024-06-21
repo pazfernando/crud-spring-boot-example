@@ -125,7 +125,7 @@ release:
   script:
     - terraform init
     - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$CI_REGISTRY_USER" -var "docker_password=$CI_REGISTRY_PASSWORD" -var "docker_registry=$CI_REGISTRY" -var "docker_image=$CI_REGISTRY_IMAGE" -var "private_key_path=/tmp/ssh_private_key.pem"  -var "crud_db_url=$CRUD_DB_URL" -var "crud_db_username=$CRUD_DB_USERNAME" -var "crud_db_password=$CRUD_DB_PASSWORD"
-    - scp -i /tmp/ssh_private_key.pem ec2-user@$INSTANCE_IP:/tmp/deployed_port .
+    # - scp -i /tmp/ssh_private_key.pem ec2-user@$INSTANCE_IP:/tmp/deployed_port .
   artifacts:
     paths:
       - deployed_port
