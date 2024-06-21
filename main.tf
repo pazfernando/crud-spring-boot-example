@@ -61,3 +61,15 @@ variable "docker_image" {
 variable "instance_ip" {
   description = "IP address of the existing EC2 instance"
 }
+
+variable "crud_db_url" {
+  description = "Database URL"
+}
+
+variable "crud_db_username" {
+  description = "Database username"
+}
+
+variable "crud_db_password" {
+  description = "Database password"
+}
