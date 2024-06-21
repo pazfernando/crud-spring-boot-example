@@ -108,12 +108,9 @@ release:
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - aws configure set default.region $AWS_DEFAULT_REGION
-    - echo $CI_REGISTRY_USER
-    - echo $CI_REGISTRY
-    - echo "$CI_REGISTRY_IMAGE":latest
   script:
     - terraform init
-    - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$CI_REGISTRY_USER" -var "docker_password=$CI_REGISTRY_PASSWORD" -var "docker_registry=$CI_REGISTRY" -var "docker_image=\"$CI_REGISTRY_IMAGE\":latest" -var "private_key_path=/tmp/ssh_private_key.pem"
+    - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$CI_REGISTRY_USER" -var "docker_password=$CI_REGISTRY_PASSWORD" -var "docker_registry=$CI_REGISTRY" -var "docker_image=$CI_REGISTRY_IMAGE" -var "private_key_path=/tmp/ssh_private_key.pem"
   dependencies:
     - docker_build
 
