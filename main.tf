@@ -10,7 +10,7 @@ resource "null_resource" "deploy_docker" {
       "echo ${var.docker_image}:latest",
       "sudo docker login -u ${var.docker_user} -p ${var.docker_password} ${var.docker_registry}",
       "sudo docker pull ${var.docker_image}:latest",
-      "random_port=$(shuf -i 10000-65535 -n 1)",
+      "random_port=$(shuf -i 10000-11000 -n 1)",
       "sudo docker run -d -p $random_port:8080 ${var.docker_image}:latest",
       "echo $random_port > /tmp/deployed_port"
     ]
