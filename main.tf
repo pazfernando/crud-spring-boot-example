@@ -13,7 +13,7 @@ resource "null_resource" "deploy_docker" {
       "random_port=$(shuf -i 10000-11000 -n 1)",
       "sudo docker stop crud-springboot-example",
       "sudo docker rm crud-springboot-example",
-      "sudo docker run -name crud-springboot-example -e SPRING_PROFILES_ACTIVE=qa -e CRUD_DB_URL=${var.crud_db_url} -e CRUD_DB_USERNAME=${var.crud_db_username} -e CRUD_DB_PASSWORD=${var.crud_db_password} -d -p $random_port:8080 ${var.docker_image}:latest",
+      "sudo docker run --name crud-springboot-example -e SPRING_PROFILES_ACTIVE=qa -e CRUD_DB_URL=${var.crud_db_url} -e CRUD_DB_USERNAME=${var.crud_db_username} -e CRUD_DB_PASSWORD=${var.crud_db_password} -d -p $random_port:8080 ${var.docker_image}:latest",
       "echo $random_port > /tmp/deployed_port"
     ]
 
