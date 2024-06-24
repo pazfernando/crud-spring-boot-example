@@ -146,11 +146,11 @@ deploy-job:      # This job runs in the deploy stage.
     CRUD_DB_PASSWORD: $CRUD_DB_PASSWORD
   before_script:
     # Configurar kubectl
+    - whoami
     - echo $KUBECONFIG_CONTENT | base64 -d > kubeconfig
     - export KUBECONFIG=$PWD/kubeconfig
     - kubectl config view  # Verifica que el kubeconfig se ha cargado correctamente
     - kubectl get nodes
-    - whoami
   script:
     - echo "Deploying application..."
     - kubectl apply -f k8s/deployment.yaml
