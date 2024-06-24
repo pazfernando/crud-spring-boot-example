@@ -147,9 +147,9 @@ deploy-job:      # This job runs in the deploy stage.
     KUBECONFIG: /etc/deploy/kubeconfig
   before_script:
     # Configurar kubectl
-    - mkdir -p /etc/deploy
-    - echo "$KUBECONFIG_CONTENT" > /etc/deploy/kubeconfig
-    - chmod 600 /etc/deploy/kubeconfig
+    - sudo mkdir -p /etc/deploy
+    - sudo echo "$KUBECONFIG_CONTENT" > /etc/deploy/kubeconfig
+    - sudo chmod 600 /etc/deploy/kubeconfig
   script:
     - echo "Deploying application..."
     - kubectl apply -f k8s/deployment.yaml
