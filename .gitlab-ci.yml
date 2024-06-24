@@ -142,10 +142,6 @@ deploy-job:      # This job runs in the deploy stage.
     name: bitnami/kubectl:latest
     entrypoint: ['']
   environment: production
-  variables:
-    CRUD_DB_URL: $CRUD_DB_URL
-    CRUD_DB_USERNAME: $CRUD_DB_USERNAME
-    CRUD_DB_PASSWORD: $CRUD_DB_PASSWORD
   before_script:
     # Configurar kubectl
     - whoami
@@ -154,6 +150,9 @@ deploy-job:      # This job runs in the deploy stage.
     - kubectl config view --raw  # Muestra el kubeconfig (asegúrate de no mostrar información sensible en los logs)
     - kubectl cluster-info  # Verifica la conexión al cluster y muestra la URL del servidor
     - kubectl get nodes     # Verifica que puedes obtener información del cluster
+    - sed -i "s|\${CRUD_DB_URL}|$PROD_CRUD_DB_URL|g" deployment.yaml
+    - sed -i "s|\${CRUD_DB_USERNAME}|$CRUD_DB_USERNAME|g" deployment.yaml
+    - sed -i "s|\${CRUD_DB_PASSWORD}|$CRUD_DB_PASSWORD|g" deployment.yaml
   script:
     - echo "Deploying application..."
     - kubectl apply -f k8s/deployment.yaml
