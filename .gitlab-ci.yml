@@ -144,10 +144,9 @@ deploy-job:      # This job runs in the deploy stage.
     CRUD_DB_URL: $CRUD_DB_URL
     CRUD_DB_USERNAME: $CRUD_DB_USERNAME
     CRUD_DB_PASSWORD: $CRUD_DB_PASSWORD
-    KUBECONFIG: /etc/deploy/kubeconfig
   before_script:
     # Configurar kubectl
-    - echo $KUBECONFIG_CONTENT > kubeconfig
+    - echo $KUBECONFIG_CONTENT | base64 -d > kubeconfig
     - export KUBECONFIG=$PWD/kubeconfig
   script:
     - echo "Deploying application..."
