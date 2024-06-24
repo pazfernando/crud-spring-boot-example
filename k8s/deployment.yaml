@@ -20,8 +20,10 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
             - name: CRUD_DB_URL
-              value: ${CRUD_DB_URL}
+              value: ${PROD_CRUD_DB_URL}
             - name: CRUD_DB_USERNAME
               value: ${CRUD_DB_USERNAME}
             - name: CRUD_DB_PASSWORD
