@@ -130,7 +130,9 @@ release:
     paths:
       - deployed_port
   dependencies:
-    - docker_build
+    - docker_build  
+  after_script:
+    - terraform output deployed_port
   only:
     - master
 
@@ -159,8 +161,6 @@ deploy-job:      # This job runs in the deploy stage.
     - echo "Application successfully deployed."
   dependencies:
     - docker_build
-  after_script:
-    - terraform output deployed_port
   when: manual
   only:
     - production
