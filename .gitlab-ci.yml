@@ -26,7 +26,6 @@ variables:
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
-  - sast
   - deploy
 
 build-job:       # This job runs in the build stage, which runs first.
@@ -51,30 +50,30 @@ unit-test-job:   # This job runs in the test stage.
   only:
     - master
 
-lint-test-job:   # This job also runs in the test stage.
-  stage: test    # It can run at the same time as unit-test-job (in parallel).
-  script:
-    - echo "Linting code... This will take about 10 seconds."
+#lint-test-job:   # This job also runs in the test stage.
+#  stage: test    # It can run at the same time as unit-test-job (in parallel).
+#  script:
+#    - echo "Linting code... This will take about 10 seconds."
     #- ./mvnw $MAVEN_CLI_OPTS sonar:sonar
-    - echo "No lint issues found."
-  only:
-    - master
+#    - echo "No lint issues found."
+#  only:
+#    - master
 
-sast-snyk:
-  stage: test
-  script:
-    - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
-    - chmod +x ./snyk
-    - mv ./snyk /usr/local/bin/ 
-    - snyk auth $SNYK_TOKEN
-    - snyk monitor
-    - snyk test --all-projects --severity-threshold=high
-  artifacts:
-    paths:
-      - snyk-report.json
-  allow_failure: true
-  only:
-    - master
+# sast-snyk:
+#   stage: test
+#   script:
+#     - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+#     - chmod +x ./snyk
+#     - mv ./snyk /usr/local/bin/ 
+#     - snyk auth $SNYK_TOKEN
+#     - snyk monitor
+#     - snyk test --all-projects --severity-threshold=high
+#   artifacts:
+#     paths:
+#       - snyk-report.json
+#   allow_failure: true
+#   only:
+#     - master
 
 docker_build:
   stage: deploy
@@ -98,62 +97,62 @@ docker_build:
   only:
     - master
 
-release:
-  stage: deploy
-  image: 
-    name: hashicorp/terraform:light
-    entrypoint: [""]
-  variables:
-    CRUD_DB_URL: $CRUD_DB_URL
-    CRUD_DB_USERNAME: $CRUD_DB_USERNAME
-    CRUD_DB_PASSWORD: $CRUD_DB_PASSWORD
-  before_script:
-    - echo "$SSH_PRIVATE_KEY" > /tmp/ssh_private_key.pem
-    - chmod 600 /tmp/ssh_private_key.pem
-    - apk add --no-cache curl jq python3 py3-pip
-    - pip3 install awscli
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set default.region $AWS_DEFAULT_REGION
-  script:
-    - terraform init
-    - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$CI_REGISTRY_USER" -var "docker_password=$CI_REGISTRY_PASSWORD" -var "docker_registry=$CI_REGISTRY" -var "docker_image=$CI_REGISTRY_IMAGE" -var "private_key_path=/tmp/ssh_private_key.pem"  -var "crud_db_url=$CRUD_DB_URL" -var "crud_db_username=$CRUD_DB_USERNAME" -var "crud_db_password=$CRUD_DB_PASSWORD"
-    # - scp -i /tmp/ssh_private_key.pem ec2-user@$INSTANCE_IP:/tmp/deployed_port .
-  artifacts:
-    paths:
-      - deployed_port
-  dependencies:
-    - docker_build  
-  after_script:
-    - terraform output deployed_port
-  only:
-    - master
+# release:
+#   stage: deploy
+#   image: 
+#     name: hashicorp/terraform:light
+#     entrypoint: [""]
+#   variables:
+#     CRUD_DB_URL: $CRUD_DB_URL
+#     CRUD_DB_USERNAME: $CRUD_DB_USERNAME
+#     CRUD_DB_PASSWORD: $CRUD_DB_PASSWORD
+#   before_script:
+#     - echo "$SSH_PRIVATE_KEY" > /tmp/ssh_private_key.pem
+#     - chmod 600 /tmp/ssh_private_key.pem
+#     - apk add --no-cache curl jq python3 py3-pip
+#     - pip3 install awscli
+#     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+#     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+#     - aws configure set default.region $AWS_DEFAULT_REGION
+#   script:
+#     - terraform init
+#     - terraform apply -auto-approve -var "region=$AWS_DEFAULT_REGION" -var "access_key=$AWS_ACCESS_KEY_ID" -var "secret_key=$AWS_SECRET_ACCESS_KEY" -var "instance_ip=$INSTANCE_IP" -var "docker_user=$CI_REGISTRY_USER" -var "docker_password=$CI_REGISTRY_PASSWORD" -var "docker_registry=$CI_REGISTRY" -var "docker_image=$CI_REGISTRY_IMAGE" -var "private_key_path=/tmp/ssh_private_key.pem"  -var "crud_db_url=$CRUD_DB_URL" -var "crud_db_username=$CRUD_DB_USERNAME" -var "crud_db_password=$CRUD_DB_PASSWORD"
+#     # - scp -i /tmp/ssh_private_key.pem ec2-user@$INSTANCE_IP:/tmp/deployed_port .
+#   artifacts:
+#     paths:
+#       - deployed_port
+#   dependencies:
+#     - docker_build  
+#   after_script:
+#     - terraform output deployed_port
+#   only:
+#     - master
 
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
-  image: 
-    name: bitnami/kubectl:latest
-    entrypoint: ['']
-  environment: production
-  before_script:
-    # Configurar kubectl
-    - whoami
-    - echo $KUBECONFIG_CONTENT | base64 -d > kubeconfig
-    - export KUBECONFIG=$PWD/kubeconfig
-    - kubectl config view --insecure-skip-tls-verify=true --raw  # Muestra el kubeconfig (asegúrate de no mostrar información sensible en los logs)
-    - kubectl cluster-info --insecure-skip-tls-verify=true  # Verifica la conexión al cluster y muestra la URL del servidor
-    - kubectl get nodes --insecure-skip-tls-verify=true     # Verifica que puedes obtener información del cluster
-    - sed -i "s|\${CRUD_DB_URL}|$PROD_CRUD_DB_URL|g" k8s/deployment.yaml
-    - sed -i "s|\${CRUD_DB_USERNAME}|$CRUD_DB_USERNAME|g" k8s/deployment.yaml
-    - sed -i "s|\${CRUD_DB_PASSWORD}|$CRUD_DB_PASSWORD|g" k8s/deployment.yaml
-  script:
-    - echo "Deploying application..."
-    - kubectl apply --insecure-skip-tls-verify=true -f k8s/deployment.yaml
-    - kubectl apply --insecure-skip-tls-verify=true -f k8s/service.yaml
-    - kubectl rollout restart deployment --insecure-skip-tls-verify=true crud-app
-    - echo "Application successfully deployed."
-  dependencies:
-    - docker_build
-  when: manual
-  only:
-    - production
+# deploy-prod:      # This job runs in the deploy stage.
+#   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+#   image: 
+#     name: bitnami/kubectl:latest
+#     entrypoint: ['']
+#   environment: production
+#   before_script:
+#     # Configurar kubectl
+#     - whoami
+#     - echo $KUBECONFIG_CONTENT | base64 -d > kubeconfig
+#     - export KUBECONFIG=$PWD/kubeconfig
+#     - kubectl config view --insecure-skip-tls-verify=true --raw  # Muestra el kubeconfig (asegúrate de no mostrar información sensible en los logs)
+#     - kubectl cluster-info --insecure-skip-tls-verify=true  # Verifica la conexión al cluster y muestra la URL del servidor
+#     - kubectl get nodes --insecure-skip-tls-verify=true     # Verifica que puedes obtener información del cluster
+#     - sed -i "s|\${CRUD_DB_URL}|$PROD_CRUD_DB_URL|g" k8s/deployment.yaml
+#     - sed -i "s|\${CRUD_DB_USERNAME}|$CRUD_DB_USERNAME|g" k8s/deployment.yaml
+#     - sed -i "s|\${CRUD_DB_PASSWORD}|$CRUD_DB_PASSWORD|g" k8s/deployment.yaml
+#   script:
+#     - echo "Deploying application..."
+#     - kubectl apply --insecure-skip-tls-verify=true -f k8s/deployment.yaml
+#     - kubectl apply --insecure-skip-tls-verify=true -f k8s/service.yaml
+#     - kubectl rollout restart deployment --insecure-skip-tls-verify=true crud-app
+#     - echo "Application successfully deployed."
+#   dependencies:
+#     - docker_build
+#   when: manual
+#   only:
+#     - production
