@@ -26,6 +26,7 @@ variables:
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
+  - sast
   - deploy
 
 build-job:       # This job runs in the build stage, which runs first.
@@ -63,7 +64,7 @@ sast:
   stage: test
 
 sast-snyk:
-  stage: test
+  stage: sast
   script:
     - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
     - chmod +x ./snyk
