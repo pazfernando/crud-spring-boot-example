@@ -150,6 +150,7 @@ deploy-job:      # This job runs in the deploy stage.
     - echo "Deploying application..."
     - kubectl apply --insecure-skip-tls-verify=true -f k8s/deployment.yaml
     - kubectl apply --insecure-skip-tls-verify=true -f k8s/service.yaml
+    - kubectl rollout restart deployment --insecure-skip-tls-verify=true crud-app
     - echo "Application successfully deployed."
   dependencies:
     - docker_build
