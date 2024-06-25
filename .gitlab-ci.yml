@@ -76,7 +76,7 @@ sast-snyk:
   only:
     - master
 
-docker_build:
+docker-container:
   stage: release
   dependencies:
     - build-job
@@ -98,7 +98,7 @@ docker_build:
   only:
     - master
 
-release:
+deploy-qa:
   stage: deploy
   image: 
     name: hashicorp/terraform:light
