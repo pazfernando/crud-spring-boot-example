@@ -123,7 +123,7 @@ deploy-qa:
     paths:
       - deployed_port
   dependencies:
-    - docker_build  
+    - docker-container
   after_script:
     - terraform output deployed_port
   only:
@@ -153,7 +153,7 @@ deploy-prod:      # This job runs in the deploy stage.
     - kubectl rollout restart deployment --insecure-skip-tls-verify=true crud-app
     - echo "Application successfully deployed."
   dependencies:
-    - docker_build
+    - docker-container
   when: manual
   only:
     - production
