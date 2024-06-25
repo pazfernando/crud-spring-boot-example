@@ -26,8 +26,6 @@ variables:
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
-  - sast
-  - docker_build
   - deploy
 
 build-job:       # This job runs in the build stage, which runs first.
@@ -61,14 +59,11 @@ lint-test-job:   # This job also runs in the test stage.
   only:
     - master
 
-#sast:
-#  stage: sast
-#  artifacts:
-#    reports:
-#      sast: gl-sast-report.json
+sast:
+  stage: test
 
 sast-snyk:
-  stage: sast
+  stage: test
   script:
     - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
     - chmod +x ./snyk
@@ -84,7 +79,7 @@ sast-snyk:
     - master
 
 docker_build:
-  stage: docker_build
+  stage: deploy
   dependencies:
     - build-job
   before_script:
