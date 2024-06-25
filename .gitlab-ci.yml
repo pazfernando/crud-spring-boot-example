@@ -157,6 +157,3 @@ deploy-job:      # This job runs in the deploy stage.
   when: manual
   only:
     - production
-
-include:
-  - template: Jobs/SAST.gitlab-ci.yml
