@@ -60,11 +60,8 @@ lint-test-job:   # This job also runs in the test stage.
   only:
     - master
 
-sast:
-  stage: test
-
 sast-snyk:
-  stage: sast
+  stage: test
   script:
     - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
     - chmod +x ./snyk
@@ -159,3 +156,6 @@ deploy-job:      # This job runs in the deploy stage.
   when: manual
   only:
     - production
+
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
