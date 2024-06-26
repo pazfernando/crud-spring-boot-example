@@ -26,14 +26,14 @@ resource "null_resource" "deploy_docker" {
   }
 }
 
-data "deployed_port" "command_output" {
+data "local_file" "command_output" {
   filename = "/tmp/deployed_port"
   depends_on = [null_resource.deploy_docker]
 }
 
 # Output para mostrar el resultado del comando
 output "_port" {
-  value = chomp(data.deployed_port.command_output.content)
+  value = chomp(data.local_file.command_output.content)
 }
 
 variable "region" {
