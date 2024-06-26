@@ -125,3 +125,31 @@ deploy-qa:
   only:
     - master
 
+deploy-prod:      # This job runs in the deploy stage.
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: ['']
+  environment: production
+  before_script:
+    # Configurar kubectl
+    - whoami
+    - echo $KUBECONFIG_CONTENT | base64 -d > kubeconfig
+    - export KUBECONFIG=$PWD/kubeconfig
+    - kubectl config view --insecure-skip-tls-verify=true --raw  # Muestra el kubeconfig (asegúrate de no mostrar información sensible en los logs)
+    - kubectl cluster-info --insecure-skip-tls-verify=true  # Verifica la conexión al cluster y muestra la URL del servidor
+    - kubectl get nodes --insecure-skip-tls-verify=true     # Verifica que puedes obtener información del cluster
+    - sed -i "s|\${CRUD_DB_URL}|$PROD_CRUD_DB_URL|g" k8s/deployment.yaml
+    - sed -i "s|\${CRUD_DB_USERNAME}|$CRUD_DB_USERNAME|g" k8s/deployment.yaml
+    - sed -i "s|\${CRUD_DB_PASSWORD}|$CRUD_DB_PASSWORD|g" k8s/deployment.yaml
+  script:
+    - echo "Deploying application..."
+    - kubectl apply --insecure-skip-tls-verify=true -f k8s/deployment.yaml
+    - kubectl apply --insecure-skip-tls-verify=true -f k8s/service.yaml
+    - kubectl rollout restart deployment --insecure-skip-tls-verify=true crud-app
+    - echo "Application successfully deployed."
+  dependencies:
+    - docker-container
+  when: manual
+  only:
+    - production
