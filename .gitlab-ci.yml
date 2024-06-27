@@ -51,30 +51,21 @@ unit-test-job:   # This job runs in the test stage.
   only:
     - master
 
-#lint-test-job:   # This job also runs in the test stage.
-#  stage: test    # It can run at the same time as unit-test-job (in parallel).
-#  script:
-#    - echo "Linting code... This will take about 10 seconds."
-    #- ./mvnw $MAVEN_CLI_OPTS sonar:sonar
-#    - echo "No lint issues found."
-#  only:
-#    - master
-
-# sast-snyk:
-#   stage: test
-#   script:
-#     - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
-#     - chmod +x ./snyk
-#     - mv ./snyk /usr/local/bin/ 
-#     - snyk auth $SNYK_TOKEN
-#     - snyk monitor
-#     - snyk test --all-projects --severity-threshold=high
-#   artifacts:
-#     paths:
-#       - snyk-report.json
-#   allow_failure: true
-#   only:
-#     - master
+sast-snyk:
+  stage: test
+  script:
+    - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+    - chmod +x ./snyk
+    - mv ./snyk /usr/local/bin/ 
+    - snyk auth $SNYK_TOKEN
+    - snyk monitor
+    - snyk test --all-projects --severity-threshold=high
+  artifacts:
+    paths:
+      - snyk-report.json
+  allow_failure: true
+  only:
+    - master
 
 docker-container:
   stage: release
